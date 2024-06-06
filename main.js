@@ -105,7 +105,7 @@ class Admin {
             },
         ]);
         if (answers.name === "Admin" && answers.password === "Admin123") {
-            console.log(chalk.bold.italic.magentaBright("\nWelcome Admin! Login successful✅."));
+            console.log(chalk.bold.italic.magentaBright("\nWelcome Admin✨✨! Login successful✅."));
             return true;
         }
         else {
@@ -281,11 +281,11 @@ class Admin {
         const selectedEvent = events[eventIndex];
         const { TicketCount } = await inquirer.prompt([
             {
-                name: "seatCount",
-                message: `Enter the number of seats you want to book for ${selectedEvent.title} Available Tickets: ${selectedEvent.tickets}...:`,
+                name: "TicketCount",
+                message: `Enter the number of Tickets you want to book for ${selectedEvent.title} Available Tickets: ${selectedEvent.tickets}...:`,
                 type: "input",
                 validate: function (value) {
-                    const seatCount = parseInt(value);
+                    const TicketCount = parseInt(value);
                     if (!isNaN(TicketCount) &&
                         TicketCount > 0 &&
                         TicketCount <= selectedEvent.tickets) {
@@ -310,7 +310,7 @@ class Admin {
         if (confirmBooking) {
             await Admin.ticketPayment();
             console.log(chalk.bold.italic.blueBright("\nYour Ticket booking is completed"));
-            console.log(chalk.bold.italic.magentaBright("\nYou will receive your ticket via email"));
+            console.log(chalk.bold.italic.magentaBright("\n\tYou will receive your ticket via email OR sms"));
         }
     }
 }
@@ -335,7 +335,7 @@ class Admin {
                 break;
             case "User Login":
                 if (users.length > 0) {
-                    console.log(chalk.bold.italic.magentaBright("WELCOME USER\n"));
+                    console.log(chalk.bold.italic.magentaBright("\n\t✨✨WELCOME USER✨✨\n"));
                     const user = await SignUp.login(users);
                     if (user) {
                         await Admin.purchaseTickets(events);
@@ -346,7 +346,7 @@ class Admin {
                 }
                 break;
             case "Admin Login":
-                console.log(chalk.bold.italic.magentaBright("WELCOME ADMIN\n"));
+                console.log(chalk.bold.italic.magentaBright("\n\t✨✨WELCOME ADMIN✨✨\n"));
                 const adminLoggedIn = await Admin.login();
                 if (adminLoggedIn) {
                     await Admin.manageEvents(events);
