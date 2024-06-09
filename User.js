@@ -17,28 +17,4 @@ export class User {
         this.phone = phone;
         this.balance = balance;
     }
-    get _name() {
-        return this.name;
-    }
-    get _surName() {
-        return this.surName;
-    }
-    get _age() {
-        return this.age;
-    }
-    get _gender() {
-        return this.gender;
-    }
-    get _EmailID() {
-        return this.EmailID;
-    }
-    get _password() {
-        return this.password;
-    }
-    get _phone() {
-        return this.phone;
-    }
-    get _balance() {
-        return this.balance;
-    }
 }

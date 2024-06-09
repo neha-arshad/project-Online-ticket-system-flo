@@ -12,186 +12,171 @@ await sleep();
 animation.stop();
 
 class SignUp {
-  static async Signup() {
-    const signInData: any = await inquirer.prompt([
-      {
-        name: "name",
-        message: chalk.bold.italic.cyanBright("Enter Your name :"),
-        type: "input",
-        validate: (input: any) =>
-          !(input.trim() === "") || chalk.bold.redBright("Name is required."),
-      },
-      {
-        name: "surName",
-        type: "input",
-        message: chalk.bold.italic.cyanBright("Enter Your Surname :"),
-        validate: (input: any) =>
-          !(input.trim() === "") ||
-          chalk.bold.redBright("Surname is required."),
-      },
-      {
-        name: "age",
-        type: "input",
-        message: chalk.bold.italic.cyanBright("Enter Your Age :"),
-        validate: (input: any) =>
-          !(input.trim() === "") || chalk.bold.redBright("Age is required."),
-      },
-      {
-        name: "gender",
-        type: "list",
-        message: chalk.bold.italic.cyanBright("Enter Your Gender :"),
-        choices: ["Male", "Female", "Other"],
-      },
-      {
-        name: "phone",
-        type: "input",
-        message: chalk.bold.italic.cyanBright("Enter Your Phone Number :"),
-        validate: (input: any) =>
-          /^\d{10}$/.test(input) ||
-          chalk.bold.redBright("Invalid phone number format:"),
-      },
-      {
-        name: "EmailID",
-        message: chalk.bold.italic.cyanBright("Enter Your Emial :"),
-        type: "input",
-        validate: (input: any) =>
-          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input) ||
-          chalk.bold.redBright("Invalid email format:"),
-      },
-      {
-        name: "password",
-        type: "password",
-        message: chalk.bold.italic.cyanBright("Enter Your Password : "),
-        validate: (input: any) =>
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(input) ||
-          chalk.bold.redBright(
-            "Password must contain at least 8 characters including one uppercase letter, one lowercase letter, and digit"
-          ),
-      },
-    ]);
-
-    return new User(
-      signInData.name,
-      signInData.surName,
-      signInData.age,
-      signInData.gender,
-      signInData.EmailID,
-      signInData.password,
-      signInData.phone,
-      0
-    );
+static async Signup() {
+	const signInData: any = await inquirer.prompt([
+		{
+			name: "name",
+			message: chalk.bold.italic.cyanBright("Enter Your name :"),
+			type: "input",
+			validate: (input: any) =>
+				!(input.trim() === "") || chalk.bold.redBright("Name is required."),
+		},
+		{
+			name: "surName",
+			type: "input",
+			message: chalk.bold.italic.cyanBright("Enter Your Surname :"),
+			validate: (input: any) =>
+				!(input.trim() === "") ||
+			chalk.bold.redBright("Surname is required."),
+		},
+		{
+			name: "age",
+			type: "input",
+			message: chalk.bold.italic.cyanBright("Enter Your Age :"),
+			validate: (input: any) =>
+				!(input.trim() === "") || chalk.bold.redBright("Age is required."),
+		},
+		{
+			name: "gender",
+			type: "list",
+			message: chalk.bold.italic.cyanBright("Enter Your Gender :"),
+			choices: ["Male", "Female", "Other"],
+		},
+		{
+			name: "phone",
+			type: "input",
+			message: chalk.bold.italic.cyanBright("Enter Your Phone Number :"),
+			validate: (input: any) =>
+				/^\d{10}$/.test(input) ||
+			chalk.bold.redBright("Invalid phone number format:"),
+		},
+		{
+			name: "EmailID",
+			message: chalk.bold.italic.cyanBright("Enter Your Emial :"),
+			type: "input",
+			validate: (input: any) =>
+				/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input) ||
+			chalk.bold.redBright("Invalid email format:"),
+		},
+		{
+			name: "password",
+			type: "password",
+			message: chalk.bold.italic.cyanBright("Enter Your Password : "),
+			validate: (input: any) =>
+				/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/.test(input) ||
+			chalk.bold.redBright("Password must contain at least 8 characters including one uppercase letter, one lowercase letter, and digit"),
+		},
+	]);
+	
+	return new User(
+		signInData.name,
+		signInData.surName,
+		signInData.age,
+		signInData.gender,
+		signInData.EmailID,
+		signInData.password,
+		signInData.phone,
+		0
+	);
   }
+	
+static async login(savedUsers: User[]) {
+	const loginData = await inquirer.prompt([
+		{
+			name: "EmailID",
+			type: "input",
+			message: chalk.bold.italic.cyanBright("Enter Your Email :"),
+		},
+		{
+			name: "password",
+			message: chalk.bold.italic.cyanBright("Enter Your Password :"),
+			type: "password",
+		},
+	]);
+	
+const foundUser = savedUsers.find((user) =>
+	user.EmailID === loginData.EmailID && 
+  user.password === loginData.password
+);
 
-  static async login(savedUsers: User[]) {
-    const loginData = await inquirer.prompt([
-      {
-        name: "EmailID",
-        type: "input",
-        message: chalk.bold.italic.cyanBright("Enter Your Email :"),
-      },
-      {
-        name: "password",
-        message: chalk.bold.italic.cyanBright("Enter Your Password :"),
-        type: "password",
-      },
-    ]);
-
-    const foundUser = savedUsers.find(
-      (user) =>
-        user.EmailID === loginData.EmailID &&
-        user.password === loginData.password
-    );
-
-    if (foundUser) {
-      console.log(
-        chalk.bold.italic.blueBright(
-          `\nWelcome Back: ${foundUser.EmailID}! Login Successful✅\n`
-        )
-      );
-      return foundUser;
-    } else {
-      console.log(
-        chalk.bold.redBright(
-          "\n\tLogin failed: ❌Invalid Email ID or Password."
-        )
-      );
-      return null;
-    }
-  }
+if (foundUser) {
+	console.log(chalk.bold.italic.blueBright(`\nWelcome Back: ${foundUser.EmailID}! Login Successful✅\n`));
+	
+	return foundUser;
+}
+ else {
+	console.log(chalk.bold.redBright("\n\tLogin failed: ❌Invalid Email ID or Password."));
+	return null;
+}
+}
 }
 
 class Admin {
-  name: string;
-  password: any;
+	name: string;
+	password: any;
+	
+	constructor(name: string, password: any) {
+		this.name = name;
+		this.password = password;
+	}
+	
+static async login() {
+	const answers = await inquirer.prompt([
+		{
+			name: "name",
+			message: chalk.bold.italic.cyanBright("Enter Admin Name:"),
+			type: "input",
+		},
+		{
+			name: "password",
+			message: chalk.bold.italic.cyanBright("Enter Admin Password:"),
+			type: "password",
+		},
+	]);
+	
+if (answers.name === "Admin" && answers.password === "Admin123") {
+	console.log(chalk.bold.italic.magentaBright("\nWelcome Admin✨✨! Login successful✅."));
+				return true;
+			}
+	 else {
+		console.log(chalk.red("Login failed: Invalid Admin Name or Password."));
+		return false;
+	}
+}
 
-  constructor(name: string, password: any) {
-    this.name = name;
-    this.password = password;
-  }
-
-  static async login() {
-    const answers = await inquirer.prompt([
-      {
-        name: "name",
-        message: chalk.bold.italic.cyanBright("Enter Admin Name:"),
-        type: "input",
-      },
-      {
-        name: "password",
-        message: chalk.bold.italic.cyanBright("Enter Admin Password:"),
-        type: "password",
-      },
-    ]);
-
-    if (answers.name === "Admin" && answers.password === "Admin123") {
-      console.log(
-        chalk.bold.italic.magentaBright("\nWelcome Admin✨✨! Login successful✅."));
+static async manageEvents(events: any[]) {
+	let manageEvent: boolean = true;
+	while (manageEvent) {
+		const { choice } = await inquirer.prompt([
+			{
+				name: "choice",
+				message: chalk.bold.italic.cyanBright("Choose an option:\n"),
+				type: "list",
+				choices: ["Create Event", "Delete Event", "Edit Event", "Exit"],
+			},
+		]);
+		
+	switch (choice) {
+		case "Create Event":
+			await Admin.createEvent(events);
+			break;
+			
+			case "Edit Event":
+				await Admin.editEvent(events);
+				break;
 				
-      return true;
-    } else {
-      console.log(chalk.red("Login failed: Invalid Admin Name or Password."));
-      return false;
-    }
-  }
-
-  static async manageEvents(events: any[]) {
-    let manageEvent: boolean = true;
-    while (manageEvent) {
-      const { choice } = await inquirer.prompt([
-        {
-          name: "choice",
-          message: chalk.bold.italic.cyanBright("Choose an option:\n"),
-          type: "list",
-          choices: ["Create Event", "Delete Event", "Edit Event", "Exit"],
-        },
-      ]);
-
-      switch (choice) {
-        case "Create Event":
-          await Admin.createEvent(events);
-          break;
-
-        case "Edit Event":
-          await Admin.editEvent(events);
-          break;
-
-        case "Delete Event":
-          await Admin.deleteEvent(events);
-          break;
-
-        case "Exit":
-          manageEvent = false;
-          break;
+				case "Delete Event":
+					await Admin.deleteEvent(events);
+					break;
+					
+					case "Exit":
+						manageEvent = false;
+						break;
       }
 
-      console.log("\nEvent List:");
-      events.forEach((events: any, index: any) => {
-        console.log(
-          `${index + 0}.${events.title}...${events.date}...${events.time}...${
-            events.city
-          }...${events.tickets}...`
-        );
-      });
+			console.log("\nEvent List:");
+			events.forEach((events: any, index: any) => {
+				console.log(`${index + 0}.${events.title}...${events.date}...${events.time}...${events.city}...${events.tickets}...`);});
     }
   }
 
