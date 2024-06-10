@@ -44,7 +44,7 @@ class SignUp {
             },
             {
                 name: "EmailID",
-                message: chalk.bold.italic.cyanBright("Enter Your Emial :"),
+                message: chalk.bold.italic.cyanBright("Enter Your Email :"),
                 type: "input",
                 validate: (input) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input) ||
                     chalk.bold.redBright("Invalid email format:"),
@@ -72,11 +72,11 @@ class SignUp {
                 type: "password",
             },
         ]);
-        const foundUser = savedUsers.find((user) => user.EmailID === loginData.EmailID &&
+        const findUser = savedUsers.find((user) => user.EmailID === loginData.EmailID &&
             user.password === loginData.password);
-        if (foundUser) {
-            console.log(chalk.bold.italic.blueBright(`\nWelcome Back: ${foundUser.EmailID}! Login Successful✅\n`));
-            return foundUser;
+        if (findUser) {
+            console.log(chalk.bold.italic.blueBright(`\nWelcome Back: ${findUser.EmailID}! Login Successful✅\n`));
+            return findUser;
         }
         else {
             console.log(chalk.bold.redBright("\n\tLogin failed: ❌Invalid Email ID or Password."));
@@ -105,7 +105,7 @@ class Admin {
             },
         ]);
         if (answers.name === "Admin" && answers.password === "Admin123") {
-            console.log(chalk.bold.italic.magentaBright("\nWelcome Admin✨✨! Login successful✅."));
+            console.log(chalk.bold.italic.magentaBright("\nWelcome Admin ✨✨! Login successful✅."));
             return true;
         }
         else {
@@ -140,7 +140,7 @@ class Admin {
             }
             console.log("\nEvent List:");
             events.forEach((events, index) => {
-                console.log(`${index + 0}.${events.title}...${events.date}...${events.time}...${events.city}...${events.tickets}...`);
+                console.log(`${index + 0}...Title${events.title}...Date${events.date}...Time${events.time}...City${events.city}...Tickets${events.tickets}...Amount${events.amount}...`);
             });
         }
     }
@@ -159,7 +159,7 @@ class Admin {
             {
                 name: "time",
                 type: "input",
-                message: chalk.bold.italic.cyan("Enter event time:"),
+                message: chalk.bold.italic.cyan("Enter event time am / pm:"),
             },
             {
                 name: "city",
@@ -171,6 +171,11 @@ class Admin {
                 type: "number",
                 message: chalk.bold.italic.cyan("Enter number of tickets available:"),
             },
+            {
+                name: "amount",
+                type: "number",
+                message: chalk.bold.italic.cyan("Enter amount for ticket:"),
+            }
         ]);
         const currentDate = new Date();
         const eventDate = new Date(eventDetails.date);
@@ -184,15 +189,22 @@ class Admin {
             time: eventDetails.time,
             city: eventDetails.city,
             tickets: eventDetails.tickets,
+            amount: eventDetails.amount,
         });
         console.log("\n\tEvent created successfully✅..");
     }
     static async editEvent(events) {
-        const eventIndex = await inquirer.prompt({
-            name: "index",
-            type: "number",
-            message: chalk.bold.italic.yellow("Enter the index of the event you want to edit:"),
-        });
+        const eventIndex = await inquirer.prompt([
+            {
+                name: "eventIndex",
+                type: "list",
+                message: chalk.bold.italic.yellow("Select the event you want to edit:"),
+                choices: events.map((event, i) => ({
+                    name: `${event.title}`,
+                    value: i,
+                }))
+            }
+        ]);
         const eventDetails = await inquirer.prompt([
             {
                 name: "title",
@@ -207,12 +219,12 @@ class Admin {
             {
                 name: "time",
                 type: "input",
-                message: chalk.bold.italic.cyan("Enter new event time:"),
+                message: chalk.bold.italic.cyan("Enter new event time am / pm:"),
             },
             {
                 name: "city",
                 type: "input",
-                message: chalk.bold.italic.cyan("Enter new event city:"),
+                message: chalk.bold.italic.cyan("Enter new event city:")
             },
             {
                 name: "tickets",
@@ -231,20 +243,26 @@ class Admin {
         console.log("\tEvent updated successfully✅..");
     }
     static async deleteEvent(events) {
-        const eventIndex = await inquirer.prompt({
-            name: "index",
-            type: "number",
-            message: chalk.bold.italic.yellow("Enter the index of the event you want to delete:"),
-        });
+        const eventIndex = await inquirer.prompt([
+            {
+                name: "index",
+                type: "number",
+                message: chalk.bold.italic.yellow("Enter the index of the event you want to delete:"),
+                choices: events.map((event, i) => ({
+                    name: `${event.title}`,
+                    value: i,
+                })),
+            }
+        ]);
         events.splice(eventIndex.index, 1);
         console.log(chalk.bold.italic.magentaBright("\tEvent deleted successfully."));
     }
-    static async ticketPayment() {
+    static async ticketPayment(totalAmount) {
         let paymentType = await inquirer.prompt([
             {
                 name: "payment",
                 type: "list",
-                message: chalk.bold.italic.cyan("Select Payment Method"),
+                message: chalk.bold.italic.cyan("Select Payment Method\n"),
                 choices: ["Bank Transfer 🏦", "Debit Card 💳", "Cash 💵"],
             },
             {
@@ -253,10 +271,10 @@ class Admin {
                 message: chalk.bold.italic.yellow("Enter the amount to transfer:"),
                 validate: function (value) {
                     const amount = parseFloat(value);
-                    if (!isNaN(amount) && amount > 0) {
+                    if (!isNaN(amount) && amount === totalAmount) {
                         return true;
                     }
-                    return chalk.bold.redBright("Please enter a valid amount.");
+                    return chalk.bold.redBright(`Please enter a correct amount of $${totalAmount}.`);
                 },
             },
         ]);
@@ -282,9 +300,9 @@ class Admin {
         const { TicketCount } = await inquirer.prompt([
             {
                 name: "TicketCount",
-                message: `Enter the number of Tickets you want to book for ${selectedEvent.title} Available Tickets: ${selectedEvent.tickets}...:`,
+                message: chalk.bold.blueBright(`Enter the number of Tickets you want to book for ${selectedEvent.title} Available Tickets: ${selectedEvent.tickets}...:`),
                 type: "input",
-                validate: function (value) {
+                validate: (value) => {
                     const TicketCount = parseInt(value);
                     if (!isNaN(TicketCount) &&
                         TicketCount > 0 &&
@@ -296,25 +314,26 @@ class Admin {
             },
         ]);
         if (TicketCount > selectedEvent.tickets) {
-            console.log(chalk.red("Not enough Tickets available."));
+            console.log(chalk.bold.italic.redBright("Not enough Tickets available."));
             return;
         }
         selectedEvent.tickets -= TicketCount;
+        const totalAmount = TicketCount * selectedEvent.amount;
         const { confirmBooking } = await inquirer.prompt([
             {
                 name: "confirmBooking",
-                message: chalk.bold.italic.cyanBright("Do you want to proceed with the booking?"),
+                message: chalk.bold.italic.cyanBright(`\nThe total amount for ${TicketCount} tickets is $${totalAmount}. Do you want to proceed with the booking?`),
                 type: "confirm",
             },
         ]);
         if (confirmBooking) {
-            await Admin.ticketPayment();
+            await Admin.ticketPayment(totalAmount);
             console.log(chalk.bold.italic.blueBright("\nYour Ticket booking is completed"));
             console.log(chalk.bold.italic.magentaBright("\n\tYou will receive your ticket via email OR sms"));
         }
     }
 }
-(async () => {
+async function main() {
     let users = [];
     let events = [];
     let logOut = false;
@@ -335,7 +354,7 @@ class Admin {
                 break;
             case "User Login":
                 if (users.length > 0) {
-                    console.log(chalk.bold.italic.magentaBright("\n\t✨✨WELCOME USER✨✨\n"));
+                    console.log(chalk.bold.italic.magentaBright("\n\t✨✨ WELCOME USER ✨✨\n"));
                     const user = await SignUp.login(users);
                     if (user) {
                         await Admin.purchaseTickets(events);
@@ -346,7 +365,7 @@ class Admin {
                 }
                 break;
             case "Admin Login":
-                console.log(chalk.bold.italic.magentaBright("\n\t✨✨WELCOME ADMIN✨✨\n"));
+                console.log(chalk.bold.italic.magentaBright("\n\t✨✨ WELCOME ADMIN ✨✨\n"));
                 const adminLoggedIn = await Admin.login();
                 if (adminLoggedIn) {
                     await Admin.manageEvents(events);
@@ -357,4 +376,5 @@ class Admin {
                 break;
         }
     }
-})();
+}
+main();

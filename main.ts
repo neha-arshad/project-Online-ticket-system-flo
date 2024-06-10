@@ -52,7 +52,7 @@ static async Signup() {
 		},
 		{
 			name: "EmailID",
-			message: chalk.bold.italic.cyanBright("Enter Your Emial :"),
+			message: chalk.bold.italic.cyanBright("Enter Your Email :"),
 			type: "input",
 			validate: (input: any) =>
 				/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input) ||
@@ -94,15 +94,15 @@ static async login(savedUsers: User[]) {
 		},
 	]);
 	
-const foundUser = savedUsers.find((user) =>
+const findUser = savedUsers.find((user) =>
 	user.EmailID === loginData.EmailID && 
   user.password === loginData.password
 );
 
-if (foundUser) {
-	console.log(chalk.bold.italic.blueBright(`\nWelcome Back: ${foundUser.EmailID}! Login Successful✅\n`));
+if (findUser) {
+	console.log(chalk.bold.italic.blueBright(`\nWelcome Back: ${findUser.EmailID}! Login Successful✅\n`));
 	
-	return foundUser;
+	return findUser;
 }
  else {
 	console.log(chalk.bold.redBright("\n\tLogin failed: ❌Invalid Email ID or Password."));
@@ -135,7 +135,7 @@ static async login() {
 	]);
 	
 if (answers.name === "Admin" && answers.password === "Admin123") {
-	console.log(chalk.bold.italic.magentaBright("\nWelcome Admin✨✨! Login successful✅."));
+	console.log(chalk.bold.italic.magentaBright("\nWelcome Admin ✨✨! Login successful✅."));
 				return true;
 			}
 	 else {
@@ -176,7 +176,7 @@ static async manageEvents(events: any[]) {
 
 			console.log("\nEvent List:");
 			events.forEach((events: any, index: any) => {
-				console.log(`${index + 0}.${events.title}...${events.date}...${events.time}...${events.city}...${events.tickets}...`);});
+				console.log(`${index + 0}...Title${events.title}...Date${events.date}...Time${events.time}...City${events.city}...Tickets${events.tickets}...Amount${events.amount}...`);});
     }
   }
 
@@ -195,7 +195,7 @@ static async manageEvents(events: any[]) {
       {
         name: "time",
         type: "input",
-        message: chalk.bold.italic.cyan("Enter event time:"),
+        message: chalk.bold.italic.cyan("Enter event time am / pm:"),
       },
       {
         name: "city",
@@ -207,6 +207,11 @@ static async manageEvents(events: any[]) {
         type: "number",
         message: chalk.bold.italic.cyan("Enter number of tickets available:"),
       },
+			{
+				name: "amount",
+				type: "number",
+				message: chalk.bold.italic.cyan("Enter amount for ticket:"),
+			}
     ]);
     const currentDate = new Date();
     const eventDate = new Date(eventDetails.date);
@@ -221,18 +226,23 @@ static async manageEvents(events: any[]) {
       time: eventDetails.time,
       city: eventDetails.city,
       tickets: eventDetails.tickets,
+			amount: eventDetails.amount,
     });
     console.log("\n\tEvent created successfully✅..");
   }
 
   static async editEvent(events: any[]) {
-    const eventIndex = await inquirer.prompt({
-      name: "index",
-      type: "number",
-      message: chalk.bold.italic.yellow(
-        "Enter the index of the event you want to edit:"
-      ),
-    });
+    const eventIndex = await inquirer.prompt([
+			{
+      name: "eventIndex",
+      type: "list",
+      message: chalk.bold.italic.yellow("Select the event you want to edit:"),
+			choices: events.map((event, i) => ({
+				name: `${event.title}`,
+				value: i,
+			}))
+		}
+		]);
 
     const eventDetails = await inquirer.prompt([
       {
@@ -248,19 +258,18 @@ static async manageEvents(events: any[]) {
       {
         name: "time",
         type: "input",
-        message: chalk.bold.italic.cyan("Enter new event time:"),
+        message: chalk.bold.italic.cyan("Enter new event time am / pm:"),
       },
       {
         name: "city",
         type: "input",
-        message: chalk.bold.italic.cyan("Enter new event city:"),
+        message: chalk.bold.italic.cyan("Enter new event city:")
       },
       {
         name: "tickets",
         type: "number",
-        message: chalk.bold.italic.cyan(
-          "Enter new number of tickets available:"
-        ),
+        message: chalk.bold.italic.cyan("Enter new number of tickets available:"),
+				
       },
     ]);
 
@@ -278,13 +287,17 @@ static async manageEvents(events: any[]) {
     console.log("\tEvent updated successfully✅..");
   }
   static async deleteEvent(events: any[]) {
-    const eventIndex = await inquirer.prompt({
+    const eventIndex = await inquirer.prompt([
+			{
       name: "index",
       type: "number",
-      message: chalk.bold.italic.yellow(
-        "Enter the index of the event you want to delete:"
-      ),
-    });
+      message: chalk.bold.italic.yellow("Enter the index of the event you want to delete:"),
+			choices: events.map((event, i) => ({
+        name: `${event.title}`,
+        value: i,
+      })),
+    
+    }]);
 
     events.splice(eventIndex.index, 1);
 
@@ -293,12 +306,12 @@ static async manageEvents(events: any[]) {
     );
   }
 
-  static async ticketPayment() {
+  static async ticketPayment(totalAmount:number) {
     let paymentType = await inquirer.prompt([
       {
         name: "payment",
         type: "list",
-        message: chalk.bold.italic.cyan("Select Payment Method"),
+        message: chalk.bold.italic.cyan("Select Payment Method\n"),
         choices: ["Bank Transfer 🏦", "Debit Card 💳", "Cash 💵"],
       },
       {
@@ -307,10 +320,10 @@ static async manageEvents(events: any[]) {
         message: chalk.bold.italic.yellow("Enter the amount to transfer:"),
         validate: function (value: any) {
           const amount = parseFloat(value);
-          if (!isNaN(amount) && amount > 0) {
+          if (!isNaN(amount) && amount === totalAmount) {
             return true;
           }
-          return chalk.bold.redBright("Please enter a valid amount.");
+          return chalk.bold.redBright(`Please enter a correct amount of $${totalAmount}.`);
         },
       },
     ]);
@@ -343,9 +356,9 @@ static async manageEvents(events: any[]) {
     const { TicketCount } = await inquirer.prompt([
       {
         name: "TicketCount",
-        message: `Enter the number of Tickets you want to book for ${selectedEvent.title} Available Tickets: ${selectedEvent.tickets}...:`,
+        message:chalk.bold.blueBright(`Enter the number of Tickets you want to book for ${selectedEvent.title} Available Tickets: ${selectedEvent.tickets}...:`),
         type: "input",
-        validate: function (value: any) {
+        validate:  (value: any) => {
           const TicketCount = parseInt(value);
           if (
             !isNaN(TicketCount) &&
@@ -360,22 +373,23 @@ static async manageEvents(events: any[]) {
     ]);
 
     if (TicketCount > selectedEvent.tickets) {
-      console.log(chalk.red("Not enough Tickets available."));
+      console.log(chalk.bold.italic.redBright("Not enough Tickets available."));
       return;
     }
 
     selectedEvent.tickets -= TicketCount;
+		const totalAmount = TicketCount * selectedEvent.amount;
 
     const { confirmBooking } = await inquirer.prompt([
       {
         name: "confirmBooking",
-        message: chalk.bold.italic.cyanBright("Do you want to proceed with the booking?"),
+        message: chalk.bold.italic.cyanBright(`\nThe total amount for ${TicketCount} tickets is $${totalAmount}. Do you want to proceed with the booking?`),
         type: "confirm",
       },
     ]);
 
     if (confirmBooking) {
-      await Admin.ticketPayment();
+      await Admin.ticketPayment(totalAmount);
       console.log(
         chalk.bold.italic.blueBright("\nYour Ticket booking is completed"));
       console.log(chalk.bold.italic.magentaBright("\n\tYou will receive your ticket via email OR sms"));
@@ -383,7 +397,7 @@ static async manageEvents(events: any[]) {
   }
 }
 
-(async () => {
+async function main(){
   let users: User[] = [];
   let events: any[] = [];
 
@@ -410,7 +424,7 @@ static async manageEvents(events: any[]) {
 
       case "User Login":
         if (users.length > 0) {
-          console.log(chalk.bold.italic.magentaBright("\n\t✨✨WELCOME USER✨✨\n"));
+          console.log(chalk.bold.italic.magentaBright("\n\t✨✨ WELCOME USER ✨✨\n"));
           const user = await SignUp.login(users);
 
           if (user) {
@@ -426,7 +440,7 @@ static async manageEvents(events: any[]) {
         break;
 
       case "Admin Login":
-        console.log(chalk.bold.italic.magentaBright("\n\t✨✨WELCOME ADMIN✨✨\n"));
+        console.log(chalk.bold.italic.magentaBright("\n\t✨✨ WELCOME ADMIN ✨✨\n"));
 
         const adminLoggedIn = await Admin.login();
         if (adminLoggedIn) {
@@ -439,4 +453,5 @@ static async manageEvents(events: any[]) {
         break;
     }
   }
-})();
+}
+main();
