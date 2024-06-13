@@ -47,7 +47,7 @@ static async Signup() {
 			type: "input",
 			message: chalk.bold.italic.cyanBright("Enter Your Phone Number :"),
 			validate: (input: any) =>
-				/^\d{10}$/.test(input) ||
+				/^\d{11}$/.test(input) ||
 			chalk.bold.redBright("Invalid phone number format:"),
 		},
 		{
@@ -176,7 +176,7 @@ static async manageEvents(events: any[]) {
 
 			console.log("\nEvent List:");
 			events.forEach((events: any, index: any) => {
-				console.log(`${index + 0}...Title${events.title}...Date${events.date}...Time${events.time}...City${events.city}...Tickets${events.tickets}...Amount${events.amount}...`);});
+				console.log(chalk.bold.blueBright.italic(`${index + 1}=> Title: ${events.title}...\nDate: ${events.date}...\nTime: ${events.time}...\nCity: ${events.city}...\nTickets: ${events.tickets}...\nAmount: ${events.amount}...`))});
     }
   }
 
@@ -228,7 +228,7 @@ static async manageEvents(events: any[]) {
       tickets: eventDetails.tickets,
 			amount: eventDetails.amount,
     });
-    console.log("\n\tEvent created successfully✅..");
+    console.log(chalk.bold.magentaBright("\n\tEvent created successfully✅.."));
   }
 
   static async editEvent(events: any[]) {
@@ -318,7 +318,7 @@ static async manageEvents(events: any[]) {
         name: "amount",
         type: "input",
         message: chalk.bold.italic.yellow("Enter the amount to transfer:"),
-        validate: function (value: any) {
+        validate:  (value: any) => {
           const amount = parseFloat(value);
           if (!isNaN(amount) && amount === totalAmount) {
             return true;
@@ -383,7 +383,7 @@ static async manageEvents(events: any[]) {
     const { confirmBooking } = await inquirer.prompt([
       {
         name: "confirmBooking",
-        message: chalk.bold.italic.cyanBright(`\nThe total amount for ${TicketCount} tickets is $${totalAmount}. Do you want to proceed with the booking?`),
+        message: chalk.bold.italic.cyanBright(`\nThe total amount for ${TicketCount} tickets is $${totalAmount}.\n Do you want to proceed with the booking?`),
         type: "confirm",
       },
     ]);
